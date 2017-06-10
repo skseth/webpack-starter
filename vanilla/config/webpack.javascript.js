@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 
-exports.babelLoader = (browserlist) => ({
+exports.babelLoader = (browserlist, uglify = false) => ({
   module: {
     rules: [
       {
@@ -13,15 +13,25 @@ exports.babelLoader = (browserlist) => ({
               ['env', {
                 targets: {
                   browsers: browserlist,
+                  uglify: uglify,
                 },
+                useBuiltIns: false,
+                modules: false,
               }],
             ],
             plugins: [
+              require.resolve('babel-plugin-transform-class-properties'),
               [
                 require('babel-plugin-transform-object-rest-spread'),
                 { useBuiltIns: true},
               ],
+              require.resolve('babel-plugin-syntax-dynamic-import'),
               // following needed for async/await and generators
+              [
+                // Async functions are converted to generators by babel-preset-env
+                require.resolve('babel-plugin-transform-regenerator'),
+                { async: false },
+              ],
               [
                 require.resolve('babel-plugin-transform-runtime'),
                 {
